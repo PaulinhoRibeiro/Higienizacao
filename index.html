@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Controle - Higienização de Veículos</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    :root {
+        --preto: #0d0d0d;
+        --preto-2: #1a1a1a;
+        --preto-3: #242424;
+        --vermelho: #e10600;
+        --vermelho-escuro: #b00500;
+        --vermelho-claro: #ff2a2a;
+        --cinza-texto: #b8b8b8;
+        --cinza-borda: #333;
+        --verde-zap: #25d366;
+    }
+
+    body {
+        background: radial-gradient(circle at top, #1f1f1f 0%, #0a0a0a 60%, #000 100%);
+        min-height: 100vh;
+        padding: 20px;
+        color: #eaeaea;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    header {
+        background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+        border-radius: 15px;
+        padding: 25px 30px;
+        margin-bottom: 20px;
+        border: 1px solid #2a2a2a;
+        border-left: 6px solid var(--vermelho);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    header h1 {
+        color: #fff;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    header h1 span.accent { color: var(--vermelho); }
+
+    header p {
+        color: var(--cinza-texto);
+        margin-top: 5px;
+        font-size: 0.95rem;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #2a2a2a;
+        border-left: 5px solid var(--vermelho);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(225,6,0,0.25);
+    }
+
+    .stat-card h3 {
+        color: var(--cinza-texto);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+        color: #fff;
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+
+    .stat-card.red { border-left-color: var(--vermelho); }
+    .stat-card.dark { border-left-color: #555; }
+    .stat-card.light { border-left-color: var(--vermelho-claro); }
+
+    .panel {
+        background: linear-gradient(145deg, #161616, #0e0e0e);
+        border-radius: 15px;
+        padding: 25px 30px;
+        margin-bottom: 20px;
+        border: 1px solid #2a2a2a;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .panel h2 {
+        color: #fff;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #2a2a2a;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .panel h2::before {
+        content: "";
+        width: 4px;
+        height: 20px;
+        background: var(--vermelho);
+        border-radius: 2px;
+        display: inline-block;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        font-size: 0.85rem;
+        color: #ddd;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        background: #0a0a0a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        color: #fff;
+        transition: all 0.2s;
+        outline: none;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: #666; }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: var(--vermelho);
+        box-shadow: 0 0 0 3px rgba(225,6,0,0.2);
+    }
+
+    .form-group select option { background: #111; color: #fff; }
+
+    .btn {
+        padding: 11px 22px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--vermelho), var(--vermelho-escuro));
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(225,6,0,0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(225,6,0,0.5);
+    }
+
+    .btn-secondary {
+        background: #222;
+        color: #eee;
+        border: 1px solid #3a3a3a;
+    }
+
+    .btn-secondary:hover { background: #2e2e2e; border-color: var(--vermelho); }
+
+    .btn-danger {
+        background: var(--vermelho-escuro);
+        color: #fff;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .btn-danger:hover { background: var(--vermelho); }
+
+    .btn-success {
+        background: #1f1f1f;
+        color: #fff;
+        border: 1px solid var(--vermelho);
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .btn-success:hover { background: var(--vermelho); }
+
+    .btn-warning {
+        background: #fff;
+        color: #000;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .btn-warning:hover { background: var(--vermelho); color:#fff; }
+
+    .btn-whatsapp {
+        background: linear-gradient(135deg, #25d366, #128c7e);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(37,211,102,0.3);
+    }
+
+    .btn-whatsapp:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(37,211,102,0.5);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filters {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filters input {
+        padding: 9px 14px;
+        background: #0a0a0a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        flex: 1;
+        min-width: 200px;
+        outline: none;
+        color: #fff;
+    }
+
+    .filters input::placeholder { color: #666; }
+    .filters input:focus { border-color: var(--vermelho); }
+
+    .filters select {
+        padding: 9px 14px;
+        background: #0a0a0a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        outline: none;
+        color: #fff;
+    }
+
+    .filters select option { background: #111; }
+
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 10px;
+        border: 1px solid #2a2a2a;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        min-width: 1100px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #1a1a1a, #000);
+        border-bottom: 2px solid var(--vermelho);
+    }
+
+    thead th {
+        padding: 14px 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        color: #fff;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #222;
+        transition: background 0.15s;
+    }
+
+    tbody tr:hover { background: #1c1c1c; }
+
+    tbody td {
+        padding: 12px;
+        color: #ddd;
+        white-space: nowrap;
+    }
+
+    tbody td strong { color: #fff; }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .badge-aguardando { background: #2a2a2a; color: #ddd; border: 1px solid #444; }
+    .badge-higienizacao { background: rgba(225,6,0,0.15); color: #ff6b6b; border: 1px solid var(--vermelho); }
+    .badge-finalizado { background: #1a1a1a; color: #fff; border: 1px solid #555; }
+    .badge-atrasado { background: var(--vermelho); color: #fff; }
+
+    .empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: #777;
+    }
+
+    .empty-icon { font-size: 3rem; margin-bottom: 10px; }
+
+    .actions-cell {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .toast {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        padding: 15px 22px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        z-index: 9999;
+        max-width: 350px;
+        border-left: 5px solid var(--vermelho);
+        background: #1a1a1a;
+    }
+
+    .toast.show { transform: translateX(0); }
+    .toast.success { border-left-color: #fff; }
+    .toast.error { border-left-color: var(--vermelho); }
+    .toast.info { border-left-color: #888; }
+
+    .totals {
+        display: flex;
+        justify-content: flex-end;
+        gap: 25px;
+        padding: 15px 20px;
+        background: #111;
+        border: 1px solid #2a2a2a;
+        border-radius: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .totals div { color: #ccc; }
+    .totals strong { color: var(--vermelho-claro); font-size: 1.1rem; }
+
+    /* Modal WhatsApp */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 20px;
+    }
+
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+        background: linear-gradient(145deg, #1a1a1a, #0e0e0e);
+        border: 1px solid #2a2a2a;
+        border-top: 4px solid var(--verde-zap);
+        border-radius: 15px;
+        max-width: 620px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    }
+
+    .modal-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #2a2a2a;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-header h3 {
+        color: #fff;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .modal-close {
+        background: transparent;
+        border: none;
+        color: #888;
+        font-size: 1.6rem;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0 5px;
+    }
+
+    .modal-close:hover { color: var(--vermelho); }
+
+    .modal-body {
+        padding: 20px 25px;
+    }
+
+    .modal-body label {
+        display: block;
+        font-size: 0.85rem;
+        color: #ddd;
+        font-weight: 600;
+        margin-bottom: 6px;
+        margin-top: 12px;
+    }
+
+    .modal-body label:first-child { margin-top: 0; }
+
+    .modal-body input,
+    .modal-body select,
+    .modal-body textarea {
+        width: 100%;
+        padding: 10px 12px;
+        background: #0a0a0a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: #fff;
+        outline: none;
+        font-family: inherit;
+    }
+
+    .modal-body input:focus,
+    .modal-body select:focus,
+    .modal-body textarea:focus {
+        border-color: var(--verde-zap);
+        box-shadow: 0 0 0 3px rgba(37,211,102,0.2);
+    }
+
+    .modal-body textarea {
+        resize: vertical;
+        min-height: 220px;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 0.8rem;
+        line-height: 1.5;
+    }
+
+    .modal-body .hint {
+        font-size: 0.75rem;
+        color: #888;
+        margin-top: 4px;
+    }
+
+    .modal-footer {
+        padding: 15px 25px 20px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        border-top: 1px solid #2a2a2a;
+    }
+
+    .preview-box {
+        background: #0a0a0a;
+        border: 1px dashed #333;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 8px;
+        font-size: 0.8rem;
+        color: #ccc;
+        max-height: 140px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        font-family: 'Consolas', monospace;
+    }
+
+    @media (max-width: 768px) {
+        header h1 { font-size: 1.3rem; }
+        .panel { padding: 18px; }
+        .stat-card .value { font-size: 1.4rem; }
+        .modal-footer { flex-direction: column; }
+        .modal-footer .btn { width: 100%; justify-content: center; }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <h1>🚗 Sistema de <span class="accent">Higienização</span> de Veículos</h1>
+        <p>Controle completo de envios, prazos, tempos e valores</p>
+    </header>
+
+    <!-- Estatísticas -->
+    <div class="stats">
+        <div class="stat-card light">
+            <h3>Total de Envios</h3>
+            <div class="value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card dark">
+            <h3>Aguardando</h3>
+            <div class="value" id="statAguardando">0</div>
+        </div>
+        <div class="stat-card red">
+            <h3>Em Higienização</h3>
+            <div class="value" id="statHigienizacao">0</div>
+        </div>
+        <div class="stat-card dark">
+            <h3>Finalizados</h3>
+            <div class="value" id="statFinalizado">0</div>
+        </div>
+        <div class="stat-card red">
+            <h3>Atrasados</h3>
+            <div class="value" id="statAtrasado">0</div>
+        </div>
+        <div class="stat-card light">
+            <h3>Faturamento</h3>
+            <div class="value" id="statFaturamento">R$ 0,00</div>
+        </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="panel">
+        <h2>➕ Novo Envio para Higienização</h2>
+        <form id="formVeiculo">
+            <input type="hidden" id="editId">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Placa do Veículo *</label>
+                    <input type="text" id="placa" placeholder="ABC-1234" maxlength="10" required style="text-transform:uppercase">
+                </div>
+                <div class="form-group">
+                    <label>Modelo / Descrição *</label>
+                    <input type="text" id="modelo" placeholder="Ex: Fiat Uno Branco" required>
+                </div>
+                <div class="form-group">
+                    <label>Motorista / Responsável</label>
+                    <input type="text" id="motorista" placeholder="Nome do motorista">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Serviço *</label>
+                    <select id="tipoServico" required>
+                        <option value="">Selecione...</option>
+                        <option value="Higienização Simples">Higienização Simples</option>
+                        <option value="Higienização Completa">Higienização Completa</option>
+                        <option value="Higienização Interna">Higienização Interna</option>
+                        <option value="Higienização Externa">Higienização Externa</option>
+                        <option value="Polimento + Higienização">Polimento + Higienização</option>
+                        <option value="Ozonização">Ozonização</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Data de Saída *</label>
+                    <input type="date" id="dataSaida" required>
+                </div>
+                <div class="form-group">
+                    <label>Hora de Saída *</label>
+                    <input type="time" id="horaSaida" required>
+                </div>
+                <div class="form-group">
+                    <label>Tempo Estimado (min) *</label>
+                    <input type="number" id="tempoEstimado" placeholder="Ex: 120" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Valor Cobrado (R$) *</label>
+                    <input type="number" id="valor" placeholder="0,00" step="0.01" min="0" required>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Observações</label>
+                    <textarea id="observacoes" rows="2" placeholder="Informações adicionais..."></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="btnSubmit">💾 Registrar Envio</button>
+                <button type="button" class="btn btn-secondary" id="btnLimpar">🧹 Limpar</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista -->
+    <div class="panel">
+        <h2>📋 Registros de Envios</h2>
+        <div class="filters">
+            <input type="text" id="filtroBusca" placeholder="🔍 Buscar por placa, modelo, motorista...">
+            <select id="filtroStatus">
+                <option value="">Todos os Status</option>
+                <option value="Aguardando">Aguardando</option>
+                <option value="Em Higienização">Em Higienização</option>
+                <option value="Finalizado">Finalizado</option>
+            </select>
+            <button class="btn btn-whatsapp" id="btnWhatsapp">📱 Enviar por WhatsApp</button>
+            <button class="btn btn-secondary" id="btnExportar">📥 Exportar CSV</button>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Placa</th>
+                        <th>Modelo</th>
+                        <th>Motorista</th>
+                        <th>Serviço</th>
+                        <th>Saída</th>
+                        <th>Previsão</th>
+                        <th>Tempo Est.</th>
+                        <th>Tempo Real</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaBody">
+                    <tr><td colspan="11" class="empty">
+                        <div class="empty-icon">📭</div>
+                        Nenhum registro cadastrado
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="totals">
+            <div>Total de Registros: <strong id="totalRegistros">0</strong></div>
+            <div>Valor Total: <strong id="totalValor">R$ 0,00</strong></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal WhatsApp -->
+<div class="modal-overlay" id="modalWhatsapp">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>📱 Enviar Relatório por WhatsApp</h3>
+            <button class="modal-close" onclick="fecharModalWhatsapp()">×</button>
+        </div>
+        <div class="modal-body">
+            <label for="zapNumero">Número do WhatsApp (com DDD e país)</label>
+            <input type="tel" id="zapNumero" placeholder="Ex: 5511999998888" inputmode="numeric">
+            <div class="hint">Use o formato: 55 (Brasil) + DDD + número. Ex.: <strong>5511987654321</strong>. Deixe vazio para escolher o contato no WhatsApp.</div>
+
+            <label for="zapEscopo">O que enviar</label>
+            <select id="zapEscopo">
+                <option value="filtrados">Somente os registros filtrados na tela</option>
+                <option value="todos" selected>Todos os registros</option>
+                <option value="finalizados">Apenas finalizados (para conferência/faturamento)</option>
+                <option value="pendentes">Apenas pendentes (aguardando + em higienização)</option>
+                <option value="atrasados">Apenas atrasados</option>
+            </select>
+
+            <label for="zapTitulo">Título do relatório</label>
+            <input type="text" id="zapTitulo" value="Relatório de Higienização de Veículos">
+
+            <label for="zapMensagem">Mensagem (editável antes de enviar)</label>
+            <textarea id="zapMensagem" spellcheck="false"></textarea>
+
+            <label>Pré-visualização</label>
+            <div class="preview-box" id="zapPreview"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="fecharModalWhatsapp()">Cancelar</button>
+            <button class="btn btn-secondary" id="btnCopiarZap">📋 Copiar Texto</button>
+            <button class="btn btn-whatsapp" id="btnEnviarZap">📱 Abrir WhatsApp</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ ESTADO ============
+let registros = JSON.parse(localStorage.getItem('higienizacao_veiculos') || '[]');
+let editandoId = null;
+
+// ============ HELPERS ============
+const $ = (id) => document.getElementById(id);
+
+function toast(msg, tipo = 'success') {
+    const t = $('toast');
+    t.textContent = msg;
+    t.className = `toast ${tipo} show`;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function formatarMoeda(v) {
+    return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function formatarDataHora(data, hora) {
+    if (!data) return '-';
+    const [a, m, d] = data.split('-');
+    return `${d}/${m}/${a} ${hora || ''}`.trim();
+}
+
+function calcularPrevisao(data, hora, minutos) {
+    if (!data || !hora || !minutos) return null;
+    const dt = new Date(`${data}T${hora}`);
+    dt.setMinutes(dt.getMinutes() + parseInt(minutos));
+    return dt;
+}
+
+function calcularTempoReal(reg) {
+    if (!reg.finalizadoEm || !reg.dataSaida || !reg.horaSaida) return null;
+    const inicio = new Date(`${reg.dataSaida}T${reg.horaSaida}`);
+    const fim = new Date(reg.finalizadoEm);
+    return Math.round((fim - inicio) / 60000);
+}
+
+function formatarDuracao(min) {
+    if (min === null || min === undefined || isNaN(min)) return '-';
+    if (min < 60) return `${min}min`;
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return `${h}h${m > 0 ? m + 'min' : ''}`;
+}
+
+function estaAtrasado(reg) {
+    if (reg.status === 'Finalizado') return false;
+    const previsao = calcularPrevisao(reg.dataSaida, reg.horaSaida, reg.tempoEstimado);
+    return previsao && new Date() > previsao;
+}
+
+function statusEfetivo(reg) {
+    return estaAtrasado(reg) ? 'Atrasado' : reg.status;
+}
+
+function salvar() {
+    localStorage.setItem('higienizacao_veiculos', JSON.stringify(registros));
+}
+
+// ============ RENDER ============
+function render() {
+    const busca = $('filtroBusca').value.toLowerCase().trim();
+    const filtroStatus = $('filtroStatus').value;
+
+    const filtrados = registros.filter(r => {
+        const matchBusca = !busca ||
+            r.placa.toLowerCase().includes(busca) ||
+            r.modelo.toLowerCase().includes(busca) ||
+            (r.motorista || '').toLowerCase().includes(busca);
+        const status = statusEfetivo(r);
+        const matchStatus = !filtroStatus || status === filtroStatus;
+        return matchBusca && matchStatus;
+    });
+
+    const tbody = $('tabelaBody');
+    if (filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" class="empty">
+            <div class="empty-icon">📭</div>Nenhum registro encontrado
+        </td></tr>`;
+    } else {
+        tbody.innerHTML = filtrados.map(r => {
+            const previsao = calcularPrevisao(r.dataSaida, r.horaSaida, r.tempoEstimado);
+            const tempoReal = calcularTempoReal(r);
+            const status = statusEfetivo(r);
+            const badgeClass = status === 'Atrasado' ? 'badge-atrasado' :
+                              status === 'Finalizado' ? 'badge-finalizado' :
+                              status === 'Em Higienização' ? 'badge-higienizacao' : 'badge-aguardando';
+
+            return `<tr>
+                <td><strong>${r.placa}</strong></td>
+                <td>${r.modelo}</td>
+                <td>${r.motorista || '-'}</td>
+                <td>${r.tipoServico}</td>
+                <td>${formatarDataHora(r.dataSaida, r.horaSaida)}</td>
+                <td>${previsao ? previsao.toLocaleString('pt-BR') : '-'}</td>
+                <td>${formatarDuracao(r.tempoEstimado)}</td>
+                <td>${formatarDuracao(tempoReal)}</td>
+                <td><strong>${formatarMoeda(r.valor)}</strong></td>
+                <td><span class="badge ${badgeClass}">${status}</span></td>
+                <td class="actions-cell">
+                    ${r.status === 'Aguardando' ? `<button class="btn btn-warning" onclick="mudarStatus('${r.id}','Em Higienização')">▶ Iniciar</button>` : ''}
+                    ${r.status === 'Em Higienização' ? `<button class="btn btn-success" onclick="mudarStatus('${r.id}','Finalizado')">✓ Finalizar</button>` : ''}
+                    <button class="btn btn-secondary" style="padding:6px 10px;font-size:0.8rem" onclick="editar('${r.id}')">✎</button>
+                    <button class="btn btn-danger" onclick="excluir('${r.id}')">🗑</button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // Stats
+    const total = registros.length;
+    const aguardando = registros.filter(r => r.status === 'Aguardando').length;
+    const higienizacao = registros.filter(r => r.status === 'Em Higienização').length;
+    const finalizado = registros.filter(r => r.status === 'Finalizado').length;
+    const atrasado = registros.filter(r => estaAtrasado(r)).length;
+    const faturamento = registros.filter(r => r.status === 'Finalizado').reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+
+    $('statTotal').textContent = total;
+    $('statAguardando').textContent = aguardando;
+    $('statHigienizacao').textContent = higienizacao;
+    $('statFinalizado').textContent = finalizado;
+    $('statAtrasado').textContent = atrasado;
+    $('statFaturamento').textContent = formatarMoeda(faturamento);
+
+    $('totalRegistros').textContent = filtrados.length;
+    $('totalValor').textContent = formatarMoeda(filtrados.reduce((s, r) => s + parseFloat(r.valor || 0), 0));
+}
+
+// ============ CRUD ============
+$('formVeiculo').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const dados = {
+        placa: $('placa').value.toUpperCase().trim(),
+        modelo: $('modelo').value.trim(),
+        motorista: $('motorista').value.trim(),
+        tipoServico: $('tipoServico').value,
+        dataSaida: $('dataSaida').value,
+        horaSaida: $('horaSaida').value,
+        tempoEstimado: parseInt($('tempoEstimado').value),
+        valor: parseFloat($('valor').value),
+        observacoes: $('observacoes').value.trim(),
+    };
+
+    if (editandoId) {
+        const idx = registros.findIndex(r => r.id === editandoId);
+        if (idx !== -1) {
+            registros[idx] = { ...registros[idx], ...dados };
+            toast('✏️ Registro atualizado com sucesso!');
+        }
+        editandoId = null;
+        $('btnSubmit').innerHTML = '💾 Registrar Envio';
+    } else {
+        registros.unshift({
+            id: Date.now().toString(),
+            ...dados,
+            status: 'Aguardando',
+            finalizadoEm: null,
+            criadoEm: new Date().toISOString(),
+        });
+        toast('✅ Envio registrado com sucesso!');
+    }
+    salvar();
+    limparForm();
+    render();
+});
+
+function limparForm() {
+    $('formVeiculo').reset();
+    $('editId').value = '';
+    editandoId = null;
+    $('btnSubmit').innerHTML = '💾 Registrar Envio';
+}
+
+$('btnLimpar').addEventListener('click', limparForm);
+
+function editar(id) {
+    const r = registros.find(x => x.id === id);
+    if (!r) return;
+    $('placa').value = r.placa;
+    $('modelo').value = r.modelo;
+    $('motorista').value = r.motorista || '';
+    $('tipoServico').value = r.tipoServico;
+    $('dataSaida').value = r.dataSaida;
+    $('horaSaida').value = r.horaSaida;
+    $('tempoEstimado').value = r.tempoEstimado;
+    $('valor').value = r.valor;
+    $('observacoes').value = r.observacoes || '';
+    editandoId = id;
+    $('btnSubmit').innerHTML = '✏️ Atualizar Registro';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function excluir(id) {
+    const r = registros.find(x => x.id === id);
+    if (!r) return;
+    if (!confirm(`Excluir o registro do veículo ${r.placa}?`)) return;
+    registros = registros.filter(x => x.id !== id);
+    salvar();
+    render();
+    toast('🗑 Registro excluído.', 'info');
+}
+
+function mudarStatus(id, novoStatus) {
+    const r = registros.find(x => x.id === id);
+    if (!r) return;
+    r.status = novoStatus;
+    if (novoStatus === 'Finalizado') {
+        r.finalizadoEm = new Date().toISOString();
+    } else if (novoStatus === 'Em Higienização' && r.finalizadoEm) {
+        r.finalizadoEm = null;
+    }
+    salvar();
+    render();
+    toast(`Status alterado para "${novoStatus}"`, 'success');
+}
+
+// ============ FILTROS ============
+$('filtroBusca').addEventListener('input', render);
+$('filtroStatus').addEventListener('change', render);
+
+// ============ EXPORTAR CSV ============
+$('btnExportar').addEventListener('click', () => {
+    if (registros.length === 0) {
+        toast('Nenhum registro para exportar.', 'error');
+        return;
+    }
+    const header = ['Placa', 'Modelo', 'Motorista', 'Serviço', 'Data Saída', 'Hora Saída', 'Tempo Estimado (min)', 'Tempo Real (min)', 'Valor (R$)', 'Status', 'Observações'];
+    const linhas = registros.map(r => [
+        r.placa, r.modelo, r.motorista || '', r.tipoServico, r.dataSaida, r.horaSaida,
+        r.tempoEstimado, calcularTempoReal(r) ?? '', r.valor.toFixed(2), statusEfetivo(r),
+        (r.observacoes || '').replace(/;/g, ','),
+    ]);
+    const csv = [header, ...linhas].map(l => l.join(';')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `higienizacao_veiculos_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('📥 CSV exportado com sucesso!');
+});
+
+// ============ WHATSAPP ============
+let zapTextoFinal = '';
+
+function registrosParaWhatsapp(escopo) {
+    const busca = $('filtroBusca').value.toLowerCase().trim();
+    const filtroStatus = $('filtroStatus').value;
+
+    if (escopo === 'filtrados') {
+        return registros.filter(r => {
+            const matchBusca = !busca ||
+                r.placa.toLowerCase().includes(busca) ||
+                r.modelo.toLowerCase().includes(busca) ||
+                (r.motorista || '').toLowerCase().includes(busca);
+            const matchStatus = !filtroStatus || statusEfetivo(r) === filtroStatus;
+            return matchBusca && matchStatus;
+        });
+    }
+    if (escopo === 'finalizados') return registros.filter(r => r.status === 'Finalizado');
+    if (escopo === 'pendentes') return registros.filter(r => r.status !== 'Finalizado');
+    if (escopo === 'atrasados') return registros.filter(r => estaAtrasado(r));
+    return registros;
+}
+
+function montarMensagem() {
+    const escopo = $('zapEscopo').value;
+    const titulo = $('zapTitulo').value.trim() || 'Relatório de Higienização';
+    const lista = registrosParaWhatsapp(escopo);
+
+    if (lista.length === 0) {
+        return { texto: `*${titulo}*\n\n_Nenhum registro encontrado para este filtro._`, lista };
+    }
+
+    const totalValor = lista.reduce((s, r) => s + parseFloat(r.valor || 0), 0);
+    const finalizados = lista.filter(r => r.status === 'Finalizado');
+    const atrasados = lista.filter(r => estaAtrasado(r));
+
+    const dataGeracao = new Date().toLocaleString('pt-BR');
+
+    let texto = `*${titulo}*\n`;
+    texto += `📅 Gerado em: ${dataGeracao}\n`;
+    texto += `━━━━━━━━━━━━━━━━━━\n`;
+    texto += `📊 *Resumo*\n`;
+    texto += `• Total de registros: *${lista.length}*\n`;
+    texto += `• Finalizados: ${finalizados.length}\n`;
+    texto += `• Pendentes: ${lista.length - finalizados.length}\n`;
+    if (atrasados.length > 0) texto += `• ⚠️ Atrasados: *${atrasados.length}*\n`;
+    texto += `• 💰 Valor total: *${formatarMoeda(totalValor)}*\n`;
+    texto += `━━━━━━━━━━━━━━━━━━\n\n`;
+
+    lista.forEach((r, i) => {
+        const status = statusEfetivo(r);
+        const icon = status === 'Atrasado' ? '⚠️' :
+                     status === 'Finalizado' ? '✅' :
+                     status === 'Em Higienização' ? '🔄' : '⏳';
+        const previsao = calcularPrevisao(r.dataSaida, r.horaSaida, r.tempoEstimado);
+        const tempoReal = calcularTempoReal(r);
+
+        texto += `${icon} *${i + 1}. ${r.placa}* — ${r.modelo}\n`;
+        if (r.motorista) texto += `   👤 Motorista: ${r.motorista}\n`;
+        texto += `   🧼 ${r.tipoServico}\n`;
+        texto += `   🕐 Saída: ${formatarDataHora(r.dataSaida, r.horaSaida)}\n`;
+        if (previsao) texto += `   ⏰ Previsão: ${previsao.toLocaleString('pt-BR')}\n`;
+        texto += `   ⌛ Tempo est.: ${formatarDuracao(r.tempoEstimado)}`;
+        if (tempoReal !== null) texto += ` | Real: ${formatarDuracao(tempoReal)}`;
+        texto += `\n   💵 Valor: ${formatarMoeda(r.valor)}\n`;
+        texto += `   📌 Status: ${status}\n`;
+        if (r.observacoes) texto += `   📝 Obs: ${r.observacoes}\n`;
+        texto += `\n`;
+    });
+
+    texto += `━━━━━━━━━━━━━━━━━━\n`;
+    texto += `_Relatório gerado pelo Sistema de Higienização de Veículos_`;
+
+    return { texto, lista };
+}
+
+function atualizarPreview() {
+    const { texto } = montarMensagem();
+    $('zapMensagem').value = texto;
+    zapTextoFinal = texto;
+    $('zapPreview').textContent = texto;
+}
+
+function abrirModalWhatsapp() {
+    if (registros.length === 0) {
+        toast('Nenhum registro para enviar.', 'error');
+        return;
+    }
+    // Pré-preenche número salvo
+    $('zapNumero').value = localStorage.getItem('zap_numero') || '';
+    $('zapTitulo').value = localStorage.getItem('zap_titulo') || 'Relatório de Higienização de Veículos';
+    atualizarPreview();
+    $('modalWhatsapp').classList.add('show');
+}
+
+function fecharModalWhatsapp() {
+    $('modalWhatsapp').classList.remove('show');
+}
+
+function enviarWhatsapp() {
+    const numero = $('zapNumero').value.replace(/\D/g, '');
+    const texto = $('zapMensagem').value.trim();
+
+    if (!texto) {
+        toast('A mensagem está vazia.', 'error');
+        return;
+    }
+
+    // Salva preferências
+    localStorage.setItem('zap_numero', numero);
+    localStorage.setItem('zap_titulo', $('zapTitulo').value);
+
+    // Codifica a mensagem para a URL
+    const textoCodificado = encodeURIComponent(texto);
+    const url = numero
+        ? `https://wa.me/${numero}?text=${textoCodificado}`
+        : `https://wa.me/?text=${textoCodificado}`;
+
+    // Abre o WhatsApp (Web em desktop, App em mobile)
+    window.open(url, '_blank');
+
+    toast('📱 WhatsApp aberto. Revise e envie!', 'success');
+    fecharModalWhatsapp();
+}
+
+async function copiarTextoWhatsapp() {
+    const texto = $('zapMensagem').value;
+    try {
+        await navigator.clipboard.writeText(texto);
+        toast('📋 Texto copiado para a área de transferência!');
+    } catch {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = texto;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        toast('📋 Texto copiado!');
+    }
+}
+
+// Eventos do modal
+$('btnWhatsapp').addEventListener('click', abrirModalWhatsapp);
+$('btnEnviarZap').addEventListener('click', enviarWhatsapp);
+$('btnCopiarZap').addEventListener('click', copiarTextoWhatsapp);
+$('zapEscopo').addEventListener('change', atualizarPreview);
+$('zapTitulo').addEventListener('input', atualizarPreview);
+$('zapMensagem').addEventListener('input', () => {
+    $('zapPreview').textContent = $('zapMensagem').value;
+});
+
+// Fecha modal clicando fora ou com ESC
+$('modalWhatsapp').addEventListener('click', (e) => {
+    if (e.target === $('modalWhatsapp')) fecharModalWhatsapp();
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && $('modalWhatsapp').classList.contains('show')) {
+        fecharModalWhatsapp();
+    }
+});
+
+// ============ ATUALIZAR ATRASOS ============
+setInterval(() => {
+    if (registros.some(r => estaAtrasado(r))) render();
+}, 60000);
+
+// Inicial
+render();
+</script>
+</body>
+</html>
